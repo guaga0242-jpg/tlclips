@@ -79,27 +79,70 @@ function calculateCart(rawItems) {
 }
 
 function hasBlobStore() {
-  return Boolean(process.env.BLOB_READ_WRITE_TOKEN || process.env.VERCEL_OIDC_TOKEN);
+  return Boolean(
+    process.env.BLOB_STORE_ID ||
+    process.env.BLOB_READ_WRITE_TOKEN ||
+    process.env.VERCEL_OIDC_TOKEN
+  );
+}
+
+function blobAuthOptions() {
+  const options = {};
+
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    options.token = process.env.BLOB_READ_WRITE_TOKEN;
+  }
+
+  if (process.env.VERCEL_OIDC_TOKEN) {
+    options.oidcToken = process.env.VERCEL_OIDC_TOKEN;
+  }
+
+  if (process.env.BLOB_STORE_ID) {
+    options.storeId = process.env.BLOB_STORE_ID;
+  }
+
+  return options;
 }
 
 async function readOrders() {
   if (!hasBlobStore()) return [];
-  const { blobs } = await list({ prefix: ORDERS_PATH, limit: 20 });
+
+  const { blobs } = await list({
+    prefix: ORDERS_PATH,
+    limit: 20,
+    ...blobAuthOptions()
+  });
+
   const blob = blobs.find(b => b.pathname === ORDERS_PATH);
   if (!blob) return [];
-  const result = await get(blob.url, { access: 'private' });
+
+  const result = await get(blob.url, {
+    access: 'private',
+    ...blobAuthOptions()
+  });
+
   if (!result) return [];
+
   const text = await new Response(result.stream).text();
-  try { return JSON.parse(text); } catch { return []; }
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return [];
+  }
 }
 
 async function saveOrders(orders) {
-  if (!hasBlobStore()) throw new Error('Armazenamento de pedidos ainda não está conectado.');
+  if (!hasBlobStore()) {
+    throw new Error('Armazenamento de pedidos ainda não está conectado.');
+  }
+
   await put(ORDERS_PATH, JSON.stringify(orders, null, 2), {
     access: 'private',
     allowOverwrite: true,
     addRandomSuffix: false,
-    contentType: 'application/json'
+    contentType: 'application/json',
+    ...blobAuthOptions()
   });
 }
 
