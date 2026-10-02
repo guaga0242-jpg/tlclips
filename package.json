@@ -10,7 +10,7 @@
     "node": "22.x"
   },
   "dependencies": {
-    "@vercel/blob": "^1.1.1",
+   "@vercel/blob": "^2.8.0",
     "express": "^5.1.0",
     "helmet": "^8.1.0"
   }
