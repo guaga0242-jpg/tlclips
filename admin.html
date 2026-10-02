@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin | TLClips</title>
+<style>
+body{margin:0;background:#070912;color:#f7f8ff;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}.wrap{width:min(1100px,94%);margin:45px auto}input,button{font:inherit}.bar{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}.bar input{flex:1;min-width:260px;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:#0f1422;color:#fff}.bar button,.action{border:0;border-radius:12px;background:#7c3cff;color:#fff;padding:11px 14px;font-weight:850;cursor:pointer}.order{padding:20px;background:#0f1422;border:1px solid rgba(255,255,255,.08);border-radius:18px;margin:14px 0}.top{display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap}.muted{color:#98a2ba}.paid{color:#5df0a5}.pending{color:#ffd275}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.danger{background:#a72b47}
+</style></head>
+<body><div class="wrap"><h1>TLClips Admin</h1><p class="muted">A chave ADMIN_KEY fica no arquivo <code>.env</code> do servidor.</p><div class="bar"><input id="key" type="password" placeholder="ADMIN_KEY"><button onclick="load()">Entrar / atualizar</button></div><div id="box"></div></div>
+<script>
+const brl=n=>Number(n).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+async function api(url,opts={}){
+ const key=document.getElementById("key").value;localStorage.setItem("tlc_admin_key",key);
+ opts.headers={...(opts.headers||{}),"x-admin-key":key};
+ const r=await fetch(url,opts);const d=await r.json();if(!r.ok)throw new Error(d.error||"Erro");return d;
+}
+async function load(){
+ const box=document.getElementById("box");
+ try{
+  const list=await api("/api/admin/orders");
+  box.innerHTML=list.length?list.map(o=>`<div class="order"><div class="top"><div><strong>${o.id}</strong><br><span class="muted">${new Date(o.createdAt).toLocaleString("pt-BR")}</span></div><div><strong>${brl(o.total)}</strong><br><span class="${o.status==="paid"?"paid":"pending"}">${o.status}</span></div></div><p>${o.customer.name} · ${o.customer.email} · ${o.customer.phone}<br>${o.customer.street}, ${o.customer.number} - ${o.customer.city}/${o.customer.state}</p><p class="muted">${o.items.map(i=>i.qty+"× "+i.name).join(" · ")}</p><div class="actions">${o.paymentMethod==="pix_manual"&&o.status!=="paid"?`<button class="action" onclick="markPaid('${o.id}')">Confirmar Pix</button>`:""}<button class="action danger" onclick="cancelOrder('${o.id}')">Cancelar</button></div></div>`).join(""):"<p class='muted'>Nenhum pedido ainda.</p>";
+ }catch(e){box.innerHTML="<p style='color:#ff98aa'>"+e.message+"</p>"}
+}
+async function markPaid(id){if(!confirm("Confirmar que o Pix deste pedido foi recebido?"))return;await api("/api/admin/orders/"+encodeURIComponent(id)+"/mark-paid",{method:"POST"});load()}
+async function cancelOrder(id){if(!confirm("Cancelar este pedido?"))return;await api("/api/admin/orders/"+encodeURIComponent(id)+"/cancel",{method:"POST"});load()}
+document.getElementById("key").value=localStorage.getItem("tlc_admin_key")||"";
+</script></body></html>

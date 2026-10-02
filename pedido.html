@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pedido | TLClips</title>
+<style>
+body{margin:0;background:#070912;color:#f7f8ff;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}.wrap{width:min(760px,92%);margin:70px auto}.logo{font-size:1.5rem;font-weight:950}.card{margin-top:25px;background:#0f1422;border:1px solid rgba(255,255,255,.08);border-radius:22px;padding:25px}.muted{color:#98a2ba}.status{display:inline-block;padding:9px 12px;border-radius:99px;background:rgba(124,60,255,.16);color:#d5c6ff;font-weight:850}.row{display:flex;justify-content:space-between;gap:16px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.07)}.total{font-size:1.25rem;font-weight:950}.btn{display:inline-block;margin-top:20px;padding:13px 17px;border-radius:13px;background:#7c3cff;color:white;text-decoration:none;font-weight:900}
+</style>
+</head>
+<body><div class="wrap"><div class="logo">🎮 TLClips</div><div class="card" id="box"><p class="muted">Carregando pedido...</p></div></div>
+<script>
+const brl=n=>Number(n).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const labels={awaiting_pix:"Aguardando Pix",awaiting_payment:"Aguardando pagamento",checkout_created:"Checkout aberto",paid:"Pagamento confirmado",payment_rejected:"Pagamento recusado",cancelled:"Cancelado",refunded:"Reembolsado",checkout_error:"Erro no checkout"};
+const id=new URLSearchParams(location.search).get("id");
+async function load(){
+  const box=document.getElementById("box");
+  if(!id){box.innerHTML="<h2>Pedido não informado</h2>";return}
+  try{
+    const res=await fetch("/api/orders/"+encodeURIComponent(id));const o=await res.json();
+    if(!res.ok) throw new Error(o.error||"Pedido não encontrado");
+    box.innerHTML=`<span class="status">${labels[o.status]||o.status}</span><h1>Pedido ${o.id}</h1><p class="muted">Cliente: ${o.customer.name} · ${o.customer.city}/${o.customer.state}</p>${o.items.map(i=>`<div class="row"><span>${i.qty}× ${i.name}</span><strong>${brl(i.lineTotal)}</strong></div>`).join("")}<div class="row"><span>Frete</span><strong>${o.shipping===0?"Grátis":brl(o.shipping)}</strong></div><div class="row total"><span>Total</span><strong>${brl(o.total)}</strong></div><p class="muted">Esta página consulta o status salvo no backend.</p><a class="btn" href="/">Voltar para a loja</a>`;
+  }catch(e){box.innerHTML="<h2>Não foi possível localizar o pedido.</h2><p class='muted'>"+e.message+"</p>"}
+}
+load();setInterval(load,10000);
+</script></body></html>

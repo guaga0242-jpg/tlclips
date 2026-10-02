@@ -1,0 +1,62 @@
+[
+  {
+    "id": "mouse-falcon",
+    "name": "TL Falcon RGB",
+    "category": "Mouse gamer",
+    "price": 129.9,
+    "oldPrice": 179.9,
+    "icon": "🖱️",
+    "description": "Sensor preciso, 6 botões e iluminação RGB ajustável.",
+    "stock": 20
+  },
+  {
+    "id": "teclado-strike",
+    "name": "TL Strike 60%",
+    "category": "Teclado mecânico",
+    "price": 249.9,
+    "oldPrice": 329.9,
+    "icon": "⌨️",
+    "description": "Formato compacto, switches mecânicos e RGB por tecla.",
+    "stock": 15
+  },
+  {
+    "id": "mousepad-speed",
+    "name": "TL Speed XXL",
+    "category": "Mousepad",
+    "price": 79.9,
+    "oldPrice": 99.9,
+    "icon": "🎯",
+    "description": "Superfície speed, base antiderrapante e tamanho 900 × 400 mm.",
+    "stock": 30
+  },
+  {
+    "id": "headset-pulse",
+    "name": "TL Pulse 7.1",
+    "category": "Headset",
+    "price": 219.9,
+    "oldPrice": 289.9,
+    "icon": "🎧",
+    "description": "Som imersivo, microfone removível e almofadas confortáveis.",
+    "stock": 12
+  },
+  {
+    "id": "mic-stream",
+    "name": "TL Stream Mic",
+    "category": "Microfone",
+    "price": 199.9,
+    "oldPrice": 269.9,
+    "icon": "🎙️",
+    "description": "Microfone USB para gameplay, streaming e chamadas.",
+    "stock": 10
+  },
+  {
+    "id": "controle-nova",
+    "name": "TL Nova Wireless",
+    "category": "Controle",
+    "price": 189.9,
+    "oldPrice": 249.9,
+    "icon": "🎮",
+    "description": "Controle sem fio ergonômico com bateria recarregável.",
+    "stock": 18
+  }
+]
